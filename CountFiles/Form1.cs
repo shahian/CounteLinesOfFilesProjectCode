@@ -47,20 +47,38 @@ namespace CountFiles
         string cshtmlfiles = string.Empty;
         List<String> TempFiles = new List<string>();
         //List<String> TempAreas = new List<string>();
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            button1_Click_1(sender, e);
+            button2_Click(sender, e);
+            FillOperation();
+            FillTextBoxResult();
+            ShowFinallMessage();
+            ClearVariables();
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+            folderBrowserDialog.Description = "Select folder to save report files";
+
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            {
+                string directoryPath = folderBrowserDialog.SelectedPath;
+                GenerateFiles(directoryPath);
+            }
+        }
         private void button1_Click_1(object sender, EventArgs e)
         {
 
             {
                 FolderBrowserDialog fbd = new FolderBrowserDialog();
+                fbd.Description = "Select source of folder";
                 DialogResult dialogResult = fbd.ShowDialog();
                 textBox1.Text = "";
                 string[] dirs = Directory.GetDirectories(fbd.SelectedPath);
                 DirSearch(fbd.SelectedPath);
-                FillOperation();
-                GenerateFiles();
-                FillTextBoxResult();
-                ShowFinallMessage();
-                ClearVariables();
+                
             }
         }
 
@@ -68,7 +86,7 @@ namespace CountFiles
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append("گزارش جزئیات فایل های پروژه در مسیر");
-            stringBuilder.AppendLine("D:\\DetailsReportFile");
+            //stringBuilder.AppendLine("D:\\DetailsReportFile");
             stringBuilder.Append("تولید گردید.");
             MessageBox.Show(stringBuilder.ToString());
         }
@@ -151,62 +169,46 @@ namespace CountFiles
             textBox1.Text += "تعداد کل لاین ها  :  " + TotallLines;
         }
 
-        private void GenerateFiles()
+        private void GenerateFiles(string directoryPath)
         {
             try
             {
-                if (Directory.Exists(@"D:\\DetailsReportFile"))
+                // Create the directory if it doesn't exist
+                if (!Directory.Exists(directoryPath))
                 {
-                    if (Directory.GetFiles(@"D:\\DetailsReportFile").Length > 0)
-                    {
-                        foreach (string file in Directory.GetFiles(@"D:\\DetailsReportFile"))
-                        {
-                            File.Delete(file);
-                        }
-                    }
-                    //Directory.Delete(@"D:\\DetailsReportFile");
+                    Directory.CreateDirectory(directoryPath);
                 }
-                if (!Directory.Exists(@"D:\\DetailsReportFile"))
-                    System.IO.Directory.CreateDirectory(@"D:\\DetailsReportFile");
-                System.IO.File.WriteAllText(@"D:\\DetailsReportFile\\DetailsReportFile.txt", result);
+
+                // Create a subfolder named "Report"
+                string reportFolderPath = Path.Combine(directoryPath, "Report");
+                if (!Directory.Exists(reportFolderPath))
+                {
+                    Directory.CreateDirectory(reportFolderPath);
+                }
+
+                // Write files to the "Report" subfolder
+                File.WriteAllText(Path.Combine(reportFolderPath, "DetailsReportFile.txt"), result);
+
                 if (javafiles.Length > 0)
-                {
-                    System.IO.File.WriteAllText(@"D:\\DetailsReportFile\\javafiles.txt", javafiles);
-                }
+                    File.WriteAllText(Path.Combine(reportFolderPath, "javafiles.txt"), javafiles);
+
                 if (cssfiles.Length > 0)
-                {
-                    System.IO.File.WriteAllText(@"D:\\DetailsReportFile\\cssfiles.txt", cssfiles);
+                    File.WriteAllText(Path.Combine(reportFolderPath, "cssfiles.txt"), cssfiles);
 
-                }
                 if (csfiles.Length > 0)
-                {
-                    System.IO.File.WriteAllText(@"D:\\DetailsReportFile\\csfiles.txt", csfiles);
+                    File.WriteAllText(Path.Combine(reportFolderPath, "csfiles.txt"), csfiles);
 
-                }
                 if (jsfiles.Length > 0)
-                {
-                    System.IO.File.WriteAllText(@"D:\\DetailsReportFile\\jsfiles.txt", jsfiles);
+                    File.WriteAllText(Path.Combine(reportFolderPath, "jsfiles.txt"), jsfiles);
 
-                }
                 if (cshtmlfiles.Length > 0)
-                {
-                    System.IO.File.WriteAllText(@"D:\\DetailsReportFile\\cshtmlfiles.txt", cshtmlfiles);
+                    File.WriteAllText(Path.Combine(reportFolderPath, "cshtmlfiles.txt"), cshtmlfiles);
 
-                }
                 if (swiftfiles.Length > 0)
-                {
-                    System.IO.File.WriteAllText(@"D:\\DetailsReportFile\\swiftfiles.txt", swiftfiles);
-
-                }
-                //if (resultArea.Length > 0)
-                //{
-                //    System.IO.File.WriteAllText(@"D:\\DetailsReportFile\\resultArea.txt", resultArea);
-
-                //}
+                    File.WriteAllText(Path.Combine(reportFolderPath, "swiftfiles.txt"), swiftfiles);
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show(ex.Message);
             }
         }
@@ -525,5 +527,9 @@ namespace CountFiles
         {
 
         }
+
+       
+
+       
     }
 }
